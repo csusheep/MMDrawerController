@@ -256,6 +256,9 @@ typedef void (^MMDrawerControllerDrawerVisualStateBlock)(MMDrawerController * dr
  */
 @property (nonatomic, assign) CGFloat panVelocityXAnimationThreshold;
 
+
+@property (nonatomic, assign) BOOL recognizesPanning;
+
 ///---------------------------------------
 /// @name Initializing a `MMDrawerController`
 ///---------------------------------------

@@ -138,6 +138,8 @@ static NSString *MMDrawerOpenSideKey = @"MMDrawerOpenSide";
 @property (nonatomic, copy) MMDrawerGestureCompletionBlock gestureCompletion;
 @property (nonatomic, assign, getter = isAnimatingDrawer) BOOL animatingDrawer;
 
+@property (nonatomic, strong, readwrite) UIPanGestureRecognizer *revealPanGestureRecognizer;
+
 @end
 
 @implementation MMDrawerController
@@ -1270,9 +1272,9 @@ static inline CGFloat originXForDrawerOriginAndTargetOriginOffset(CGFloat origin
 
 #pragma mark - Helpers
 -(void)setupGestureRecognizers{
-    UIPanGestureRecognizer * pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureCallback:)];
-    [pan setDelegate:self];
-    [self.view addGestureRecognizer:pan];
+    _revealPanGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureCallback:)];
+    [_revealPanGestureRecognizer setDelegate:self];
+    [self.view addGestureRecognizer:_revealPanGestureRecognizer];
     
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGestureCallback:)];
     [tap setDelegate:self];
@@ -1476,4 +1478,30 @@ static inline CGFloat originXForDrawerOriginAndTargetOriginOffset(CGFloat origin
     return (CGRectContainsPoint(rightBezelRect, point) &&
             [self isPointContainedWithinCenterViewContentRect:point]);
 }
+
+- (void)setRecognizesPanning:(BOOL)recognizesPanning {
+    if (_recognizesPanning != recognizesPanning)
+    {
+        _recognizesPanning = recognizesPanning;
+        [self updatePanGestureRecognizerPresence];
+    }
+}
+
+- (void)updatePanGestureRecognizerPresence {
+    if (self.recognizesPanning){
+        if (![self.view.gestureRecognizers containsObject:_revealPanGestureRecognizer])
+        {
+            [self.view addGestureRecognizer:_revealPanGestureRecognizer];
+        }
+    }
+    else
+    {
+        if ([self.view.gestureRecognizers containsObject:_revealPanGestureRecognizer])
+        {
+            [self.view removeGestureRecognizer:_revealPanGestureRecognizer];
+        }
+    }
+}
+
+
 @end
